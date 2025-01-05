@@ -76,7 +76,7 @@ export class Renderer {
     const encoder = this.device.createCommandEncoder();
     const pass = encoder.beginRenderPass(this.renderPassDescriptor);
 
-    // TODO: update input and physics
+    // update camera matrices, up, right, forward vectors
     camera.update(this.canvas);
 
     // TODO: load geomotry and textures for object
@@ -87,6 +87,7 @@ export class Renderer {
     //
     for (const [i, obj] of scene.objects.entries()) {
       if (i == 0) {
+        obj.setUniforms(camera.camMatrix);
         obj.init(this.device, pass);
       }
       obj.draw(pass);

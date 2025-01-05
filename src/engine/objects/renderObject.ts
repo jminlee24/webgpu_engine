@@ -12,4 +12,7 @@ export default interface renderObject {
 
   // runs for every instance of the object
   draw(pass: GPURenderPassEncoder): void;
+
+  // TODO: make it for more than just float32Arrays
+  setUniforms(uniforms: Float32Array): void;
 }
