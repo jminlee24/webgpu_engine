@@ -1,5 +1,15 @@
+import renderObject from "./objects/renderObject";
+
 export class Scene {
-  constructor() {}
+  objects: renderObject[];
+
+  constructor() {
+    this.objects = [];
+  }
+
+  add(obj: renderObject) {
+    this.objects.push(obj);
+  }
 
   update() {
     //TODO: Update scene

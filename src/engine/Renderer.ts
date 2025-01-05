@@ -23,9 +23,11 @@ export class Renderer {
   async init() {
     const adapter = await navigator.gpu?.requestAdapter();
     const device = await adapter?.requestDevice();
+
     if (!device) {
       throw new UnsupportedError();
     }
+
     this.device = device;
     const presentationFormat = navigator.gpu.getPreferredCanvasFormat();
 
@@ -75,8 +77,9 @@ export class Renderer {
     const pass = encoder.beginRenderPass(this.renderPassDescriptor);
 
     // TODO: update input and physics
-    // TODO: load view / projection matrix
-    camera.setUniforms();
+    camera.update(this.canvas, this.device);
+
+    camera.setUniforms(this.device);
 
     // TODO: load geomotry and textures for object
     // TODO: foreach instance of object :
@@ -84,6 +87,13 @@ export class Renderer {
     //         load instance specific materials or default materials
     //         render object
     //
+    for (const [i, obj] of scene.objects.entries()) {
+      if (i == 0) {
+        obj.init(this.device, pass, camera.uniformBuffer);
+      }
+      obj.draw(pass);
+    }
+
     pass.end();
 
     const commandBuffer = encoder.finish();
