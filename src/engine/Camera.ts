@@ -22,14 +22,9 @@ export abstract class Camera {
     this.camMatrix = mat4.identity();
   }
 
-  update(canvas: HTMLCanvasElement, device: GPUDevice) {
+  update(canvas: HTMLCanvasElement) {
     if (!this._initialized) {
       this.canvas = canvas;
-      this.uniformBuffer = device.createBuffer({
-        label: "camera uniforms",
-        size: this.camMatrix.byteLength * 2,
-        usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
-      });
 
       this._initialized = true;
     }
@@ -38,11 +33,6 @@ export abstract class Camera {
     this.forward = vec3.normalize(this.position);
     this.right = vec3.normalize(vec3.cross(vec3.create(0, 1, 0), this.forward));
     this.up = vec3.normalize(vec3.cross(this.forward, this.right));
-  }
-
-  setUniforms(device: GPUDevice) {
-    device.queue.writeBuffer(this.uniformBuffer, 0, this.camMatrix);
-    // TODO: set uniforms
   }
 }
 
@@ -59,7 +49,7 @@ export class PerspectiveCamera extends Camera {
     fov: number,
     aspect: number,
     near: number = 0.01,
-    far: number = 10000,
+    far: number = 10000
   ) {
     super(0, 0, 0);
     this.fov = fov;
@@ -72,12 +62,12 @@ export class PerspectiveCamera extends Camera {
       this.position,
       // target/lookat
       vec3.subtract(this.position, this.forward),
-      this.up,
+      this.up
     );
   }
 
-  update(canvas: HTMLCanvasElement, device: GPUDevice) {
-    super.update(canvas, device);
+  update(canvas: HTMLCanvasElement) {
+    super.update(canvas);
 
     const aspect = this.canvas.width / this.canvas.height;
     if (aspect != this.aspect) {

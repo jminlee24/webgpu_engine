@@ -5,7 +5,6 @@ export default class Triangle implements renderObject {
   private _initialized: boolean = false;
 
   pipeline!: GPURenderPipeline;
-  bindGroup!: GPUBindGroup;
 
   vertices: Float32Array;
   indices: Int32Array;
@@ -25,7 +24,7 @@ export default class Triangle implements renderObject {
     this.numVertices = 3;
   }
 
-  init(device: GPUDevice, pass: GPURenderPassEncoder, cameraBuffer: GPUBuffer) {
+  init(device: GPUDevice, pass: GPURenderPassEncoder) {
     const module = device.createShaderModule({ code: shader });
     this.pipeline = device.createRenderPipeline({
       layout: "auto",
@@ -54,23 +53,11 @@ export default class Triangle implements renderObject {
         usage: GPUBufferUsage.INDEX | GPUBufferUsage.COPY_DST,
       });
 
-      this.bindGroup = device.createBindGroup({
-        label: "triangle bindgroup",
-        layout: this.pipeline.getBindGroupLayout(0),
-        entries: [
-          {
-            binding: 0,
-            resource: { buffer: cameraBuffer },
-          },
-        ],
-      });
-
       device.queue.writeBuffer(this.vertexBuffer, 0, this.vertices);
       device.queue.writeBuffer(this.indexBuffer, 0, this.indices);
     }
 
     pass.setPipeline(this.pipeline);
-    pass.setBindGroup(0, this.bindGroup);
   }
 
   draw(pass: GPURenderPassEncoder) {

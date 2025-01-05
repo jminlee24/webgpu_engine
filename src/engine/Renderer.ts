@@ -77,9 +77,7 @@ export class Renderer {
     const pass = encoder.beginRenderPass(this.renderPassDescriptor);
 
     // TODO: update input and physics
-    camera.update(this.canvas, this.device);
-
-    camera.setUniforms(this.device);
+    camera.update(this.canvas);
 
     // TODO: load geomotry and textures for object
     // TODO: foreach instance of object :
@@ -89,7 +87,7 @@ export class Renderer {
     //
     for (const [i, obj] of scene.objects.entries()) {
       if (i == 0) {
-        obj.init(this.device, pass, camera.uniformBuffer);
+        obj.init(this.device, pass);
       }
       obj.draw(pass);
     }
