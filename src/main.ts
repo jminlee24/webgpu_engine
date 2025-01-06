@@ -21,7 +21,8 @@ const fpsDisplay = document.getElementById("fps-display") as HTMLElement;
 
 const render = () => {
   const thisloop = new Date();
-  const fps = 1000 / (Number(thisloop) - Number(lastloop));
+  const deltaTime = Number(thisloop) - Number(lastloop);
+  const fps = 1000 / deltaTime;
   lastloop = thisloop;
 
   fpsDisplay.innerText = fps.toString().substring(0, 4);
@@ -29,7 +30,7 @@ const render = () => {
   canvas.width = window.innerWidth / 2;
   canvas.height = window.innerHeight / 2;
 
-  controller.handle_input();
+  controller.handle_input(deltaTime / 1000);
 
   scene.update();
 

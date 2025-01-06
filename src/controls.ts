@@ -9,6 +9,8 @@ export class Controller {
   backward: boolean = false;
   left: boolean = false;
   right: boolean = false;
+  up: boolean = false;
+  down: boolean = false;
 
   x: number = 0;
   y: number = 0;
@@ -33,6 +35,12 @@ export class Controller {
           break;
         case "d":
           this.right = true;
+          break;
+        case "q":
+          this.up = true;
+          break;
+        case "e":
+          this.down = true;
       }
     };
 
@@ -49,6 +57,12 @@ export class Controller {
           break;
         case "d":
           this.right = false;
+          break;
+        case "q":
+          this.up = false;
+          break;
+        case "e":
+          this.down = false;
       }
     };
 
@@ -67,22 +81,24 @@ export class Controller {
     };
   }
 
-  handle_input() {
+  handle_input(deltaTime: number) {
     const sign = (positive: boolean, negative: boolean) =>
       (positive ? 1 : 0) - (negative ? 1 : 0);
     const velocity = vec3.create(0, 0, 0);
 
     // position
-    const deltaRight = sign(this.right, this.left);
-    const deltaBack = sign(this.backward, this.forward);
+    const deltaRight = sign(this.right, this.left) * deltaTime * 10;
+    const deltaBack = sign(this.backward, this.forward) * deltaTime * 10;
+    const deltaUp = sign(this.up, this.down) * deltaTime * 10;
 
     vec3.addScaled(velocity, this.camera.right, deltaRight, velocity);
     vec3.addScaled(velocity, this.camera.backward, deltaBack, velocity);
+    vec3.addScaled(velocity, this.camera.up, deltaUp, velocity);
 
     this.camera.position = vec3.add(
       this.camera.position,
       velocity,
-      this.camera.position,
+      this.camera.position
     );
 
     // rotation
@@ -92,10 +108,10 @@ export class Controller {
     this.yaw -= this.x * 0.005;
     this.pitch -= this.y * 0.005;
 
-    this.pitch = clamp(this.pitch, 0, Math.PI * 2);
-    this.yaw = clamp(this.yaw, -Math.PI / 2, Math.PI / 2);
+    this.yaw = clamp(this.yaw, -Math.PI, Math.PI);
+    this.pitch = clamp(this.pitch, -Math.PI / 2, Math.PI / 2);
 
-    //mat4.rotateX(this.camera.matrix, this.pitch, this.camera.matrix);
+    mat4.rotateX(this.camera.matrix, this.pitch, this.camera.matrix);
     mat4.rotateY(this.camera.matrix, this.yaw, this.camera.matrix);
 
     this.x = 0;
