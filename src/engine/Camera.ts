@@ -8,15 +8,26 @@ export abstract class Camera {
   position: Vec3;
   up: Vec3;
   right: Vec3;
-  forward: Vec3;
+  backward: Vec3;
 
+  matrix: Mat4;
   camMatrix: Mat4;
 
   constructor(x: number, y: number, z: number) {
-    this.position = vec3.create(x, y, z);
-    this.forward = vec3.normalize(this.position);
-    this.right = vec3.normalize(vec3.cross(vec3.create(0, 1, 0), this.forward));
-    this.up = vec3.normalize(vec3.cross(this.forward, this.right));
+    this.matrix = mat4.identity();
+
+    this.right = new Float32Array(this.matrix.buffer, 0, 4);
+    this.up = new Float32Array(this.matrix.buffer, 16, 4);
+    this.backward = new Float32Array(this.matrix.buffer, 32, 4);
+    this.position = new Float32Array(this.matrix.buffer, 48, 4);
+
+    this.position.set([x, y, z]);
+    this.backward = vec3.normalize(this.position, this.backward);
+    this.right = vec3.normalize(
+      vec3.cross(vec3.create(0, 1, 0), this.backward),
+      this.right,
+    );
+    this.up = vec3.normalize(vec3.cross(this.backward, this.right), this.up);
 
     this.camMatrix = mat4.identity();
   }
@@ -53,12 +64,7 @@ export class PerspectiveCamera extends Camera {
     this.far = far;
 
     this.perspectiveMatrix = mat4.perspective(fov, aspect, near, far);
-    this.viewMatrix = mat4.lookAt(
-      this.position,
-      // target/lookat
-      vec3.subtract(this.position, this.forward),
-      this.up,
-    );
+    this.viewMatrix = mat4.inverse(this.matrix);
   }
 
   update(canvas: HTMLCanvasElement) {
@@ -75,13 +81,7 @@ export class PerspectiveCamera extends Camera {
       );
     }
 
-    this.viewMatrix = mat4.lookAt(
-      this.position,
-      // target/lookat
-      vec3.subtract(this.position, this.forward),
-      this.up,
-    );
-
+    this.viewMatrix = mat4.inverse(this.matrix);
     this.camMatrix = mat4.multiply(this.perspectiveMatrix, this.viewMatrix);
   }
 }

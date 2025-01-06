@@ -14,7 +14,7 @@ const camera = new PerspectiveCamera(45, canvas.width / canvas.height);
 const triangle = new Triangle();
 scene.add(triangle);
 
-new Controller(camera);
+const controller = new Controller(camera, canvas);
 
 let lastloop = new Date();
 const fpsDisplay = document.getElementById("fps-display") as HTMLElement;
@@ -28,6 +28,8 @@ const render = () => {
 
   canvas.width = window.innerWidth / 2;
   canvas.height = window.innerHeight / 2;
+
+  controller.handle_input();
 
   scene.update();
 
