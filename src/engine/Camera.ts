@@ -23,12 +23,9 @@ export abstract class Camera {
     this.position = new Float32Array(this.matrix.buffer, 48, 4);
 
     this.position.set([x, y, z]);
-    this.backward = vec3.normalize(this.position, this.backward);
-    this.right = vec3.normalize(
-      vec3.cross(vec3.create(0, 1, 0), this.backward),
-      this.right,
-    );
-    this.up = vec3.normalize(vec3.cross(this.backward, this.right), this.up);
+    vec3.normalize(this.position, this.backward);
+    vec3.normalize(vec3.cross(vec3.create(0, 1, 0), this.backward), this.right);
+    vec3.normalize(vec3.cross(this.backward, this.right), this.up);
 
     this.camMatrix = mat4.identity();
   }
@@ -100,6 +97,8 @@ export class PerspectiveCamera extends Camera {
       );
     }
 
+    this.recalculateAngles(this.backward);
+
     this.viewMatrix = mat4.inverse(this.matrix);
     this.camMatrix = mat4.multiply(this.perspectiveMatrix, this.viewMatrix);
 
@@ -169,16 +168,7 @@ export class PerspectiveCamera extends Camera {
       (positive ? 1 : 0) - (negative ? 1 : 0);
     const velocity = vec3.create(0, 0, 0);
 
-    // position
-    const deltaRight = sign(this._right, this._left) * deltaTime * 10;
-    const deltaBack = sign(this._backward, this._forward) * deltaTime * 10;
-    const deltaUp = sign(this._up, this._down) * deltaTime * 10;
-
-    vec3.addScaled(velocity, this.right, deltaRight, velocity);
-    vec3.addScaled(velocity, this.backward, deltaBack, velocity);
-    vec3.addScaled(velocity, this.up, deltaUp, velocity);
-
-    this.position = vec3.add(this.position, velocity, this.position);
+    const position = vec3.copy(this.position);
 
     // rotation
     // somewhere along the way I completely lost the sauce on the axis and I have no idea how
@@ -190,12 +180,27 @@ export class PerspectiveCamera extends Camera {
     this.yaw = clamp(this.yaw, -Math.PI, Math.PI);
     this.pitch = clamp(this.pitch, -Math.PI / 2, Math.PI / 2);
 
-    mat4.rotateX(this.matrix, this.pitch, this.matrix);
-    mat4.rotateY(this.matrix, this.yaw, this.matrix);
+    mat4.copy(mat4.rotateX(mat4.rotationY(this.yaw), this.pitch), this.matrix);
+
+    // position
+    const deltaRight = sign(this._right, this._left) * deltaTime * 10;
+    const deltaBack = sign(this._backward, this._forward) * deltaTime * 10;
+    const deltaUp = sign(this._up, this._down) * deltaTime * 10;
+
+    vec3.addScaled(velocity, this.right, deltaRight, velocity);
+    vec3.addScaled(velocity, this.backward, deltaBack, velocity);
+    vec3.addScaled(velocity, this.up, deltaUp, velocity);
+
+    this.recalculateAngles(this.matrix);
+
+    vec3.add(position, velocity, this.position);
 
     this.x = 0;
     this.y = 0;
-    this.yaw = 0;
-    this.pitch = 0;
+  }
+
+  recalculateAngles(dir: Vec3) {
+    this.yaw = Math.atan2(dir[0], dir[2]);
+    this.pitch = -Math.asin(dir[1]);
   }
 }
