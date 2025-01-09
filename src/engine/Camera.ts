@@ -88,7 +88,6 @@ export class PerspectiveCamera extends Camera {
 
   update(canvas: HTMLCanvasElement, deltaTime: number) {
     super.update(canvas, deltaTime);
-    console.log(deltaTime);
 
     const aspect = this.canvas.width / this.canvas.height;
     if (aspect != this.aspect) {
