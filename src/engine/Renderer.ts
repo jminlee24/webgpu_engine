@@ -63,7 +63,7 @@ export class Renderer {
     this.render(scene, camera);
   }
 
-  render(scene: Scene, camera: Camera) {
+  render(scene: Scene, camera: Camera, deltaTime: number = -1) {
     if (this._initialized === false) {
       return this.renderAsync(scene, camera);
     }
@@ -77,7 +77,7 @@ export class Renderer {
     const pass = encoder.beginRenderPass(this.renderPassDescriptor);
 
     // update camera matrices, up, right, forward vectors
-    camera.update(this.canvas);
+    camera.update(this.canvas, deltaTime);
 
     // TODO: load geomotry and textures for object
     // TODO: foreach instance of object :
