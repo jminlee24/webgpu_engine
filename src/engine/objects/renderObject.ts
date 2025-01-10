@@ -1,4 +1,5 @@
 export default interface renderObject {
+  position: Float32Array;
   pipeline: GPURenderPipeline;
 
   vertices: Float32Array;

@@ -1,8 +1,11 @@
+import { mat4 } from "wgpu-matrix";
 import shader from "../shaders/shader.wgsl?raw";
 import renderObject from "./renderObject";
 
 export default class Triangle implements renderObject {
   private _initialized: boolean = false;
+
+  position: Float32Array;
 
   pipeline!: GPURenderPipeline;
   bindGroup!: GPUBindGroup;
@@ -16,7 +19,8 @@ export default class Triangle implements renderObject {
   vertexBuffer!: GPUBuffer;
   indexBuffer!: GPUBuffer;
 
-  constructor() {
+  constructor(x: number = 0, y: number = 0, z: number = 0) {
+    this.position = new Float32Array([x, y, z]);
     // prettier-ignore
     this.vertices = new Float32Array([
       1.0, -1.0, 0.0, 
@@ -89,6 +93,8 @@ export default class Triangle implements renderObject {
   }
 
   setUniforms(uniforms: Float32Array) {
-    this.uniforms = uniforms;
+    const model = mat4.translation(this.position);
+
+    this.uniforms = mat4.multiply(uniforms, model);
   }
 }

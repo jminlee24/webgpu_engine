@@ -12,6 +12,8 @@ const camera = new PerspectiveCamera(45, canvas.width / canvas.height);
 
 const triangle = new Triangle();
 scene.add(triangle);
+const triangle1 = new Triangle(1, 1, 1);
+scene.add(triangle1);
 
 let lastloop = new Date();
 const fpsDisplay = document.getElementById("fps-display") as HTMLElement;

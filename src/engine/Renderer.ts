@@ -86,7 +86,9 @@ export class Renderer {
     //         render object
     //
     for (const [i, obj] of scene.objects.entries()) {
-      if (i == 0) {
+      // TODO: Fix this part
+      // init should onyl run once at the very start of the render
+      if (i >= 0) {
         obj.setUniforms(camera.camMatrix);
         obj.init(this.device, pass);
       }
