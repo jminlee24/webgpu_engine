@@ -1,58 +1,19 @@
-import { mat4 } from "wgpu-matrix";
 import shader from "../shaders/shader.wgsl?raw";
 import renderObject from "./renderObject";
 
-export default class Triangle implements renderObject {
-  private _initialized: boolean = false;
-
-  position: Float32Array;
-
-  pipeline!: GPURenderPipeline;
-  bindGroup!: GPUBindGroup;
-
-  vertices: Float32Array;
-  indices: Int32Array;
-  uniforms: Float32Array;
-  numVertices: number;
-
-  uniformBuffer!: GPUBuffer;
-  vertexBuffer!: GPUBuffer;
-  indexBuffer!: GPUBuffer;
-
+export default class Triangle extends renderObject {
   constructor(x: number = 0, y: number = 0, z: number = 0) {
-    this.position = new Float32Array([x, y, z]);
-    // prettier-ignore
+    super(x, y, z);
     this.vertices = new Float32Array([
-      1.0, -1.0, 0.0, 
-      1.0,  1.0, 0.0, 
-     -1.0, -1.0, 0.0]);
+      1.0, -1.0, 0.0, 1.0, 1.0, 0.0, -1.0, -1.0, 0.0,
+    ]);
     this.indices = new Int32Array([0, 1, 2]);
     this.numVertices = 3;
     this.uniforms = new Float32Array();
   }
 
   initialize(device: GPUDevice) {
-    this.vertexBuffer = device.createBuffer({
-      size: this.vertices.byteLength,
-      usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST,
-    });
-    this.indexBuffer = device.createBuffer({
-      size: this.indices.byteLength,
-      usage: GPUBufferUsage.INDEX | GPUBufferUsage.COPY_DST,
-    });
-    this.uniformBuffer = device.createBuffer({
-      size: this.uniforms.byteLength,
-      usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
-    });
-
-    this.bindGroup = device.createBindGroup({
-      layout: this.pipeline.getBindGroupLayout(0),
-      entries: [{ binding: 0, resource: { buffer: this.uniformBuffer } }],
-    });
-
-    device.queue.writeBuffer(this.vertexBuffer, 0, this.vertices);
-    device.queue.writeBuffer(this.indexBuffer, 0, this.indices);
-    device.queue.writeBuffer(this.uniformBuffer, 0, this.uniforms);
+    super.initialize(device);
   }
 
   init(device: GPUDevice, pass: GPURenderPassEncoder) {
@@ -85,16 +46,7 @@ export default class Triangle implements renderObject {
     pass.setBindGroup(0, this.bindGroup);
   }
 
-  draw(pass: GPURenderPassEncoder) {
-    pass.setVertexBuffer(0, this.vertexBuffer);
-    pass.setIndexBuffer(this.indexBuffer, "uint32");
-
-    pass.drawIndexed(this.numVertices);
-  }
-
   setUniforms(uniforms: Float32Array) {
-    const model = mat4.translation(this.position);
-
-    this.uniforms = mat4.multiply(uniforms, model);
+    super.setUniforms(uniforms);
   }
 }
