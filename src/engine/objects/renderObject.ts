@@ -50,28 +50,7 @@ export default abstract class renderObject {
   }
 
   // runs once per type (at the beginning of the render loop)
-  init(device: GPUDevice, pass: GPURenderPassEncoder, shader: string) {
-    const module = device.createShaderModule({ code: shader });
-    this.pipeline = device.createRenderPipeline({
-      layout: "auto",
-      vertex: {
-        module,
-        buffers: [
-          {
-            arrayStride: 3 * 4,
-            attributes: [{ shaderLocation: 0, offset: 0, format: "float32x3" }],
-          },
-        ],
-      },
-      fragment: {
-        module,
-        targets: [{ format: navigator.gpu.getPreferredCanvasFormat() }],
-      },
-      primitive: {
-        cullMode: "back",
-      },
-    });
-
+  init(device: GPUDevice, pass: GPURenderPassEncoder) {
     if (!this._initialized) {
       this.initialize(device);
     }
@@ -90,7 +69,6 @@ export default abstract class renderObject {
 
   // TODO: make it for more than just float32Arrays
   setUniforms(uniforms: Float32Array) {
-    const model = mat4.translation(this.position);
-    this.uniforms = mat4.multiply(uniforms, model);
+    this.uniforms = uniforms;
   }
 }

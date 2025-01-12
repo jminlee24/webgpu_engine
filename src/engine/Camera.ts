@@ -177,7 +177,6 @@ export class PerspectiveCamera extends Camera {
     this.yaw -= this.x * 0.005;
     this.pitch -= this.y * 0.005;
 
-    this.yaw = clamp(this.yaw, -Math.PI, Math.PI);
     this.pitch = clamp(this.pitch, -Math.PI / 2, Math.PI / 2);
 
     mat4.copy(mat4.rotateX(mat4.rotationY(this.yaw), this.pitch), this.matrix);

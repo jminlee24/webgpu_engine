@@ -36,6 +36,13 @@ export class Renderer {
       format: presentationFormat,
     });
 
+    const depthTexture = this.device.createTexture({
+      size: { width: this.canvas.width, height: this.canvas.height },
+      dimension: "2d",
+      format: "depth24plus-stencil8",
+      usage: GPUTextureUsage.RENDER_ATTACHMENT,
+    });
+
     this.renderPassDescriptor = {
       colorAttachments: [
         {
@@ -45,6 +52,19 @@ export class Renderer {
           storeOp: "store",
         },
       ],
+      depthStencilAttachment: {
+        view: depthTexture.createView({
+          format: "depth24plus-stencil8",
+          dimension: "2d",
+          aspect: "all",
+        }),
+        depthClearValue: 1,
+        depthLoadOp: "clear",
+        depthStoreOp: "store",
+        stencilLoadOp: "clear",
+        stencilStoreOp: "store",
+        stencilClearValue: 1,
+      },
     };
 
     const resizeObserver = new ResizeObserver(() => {

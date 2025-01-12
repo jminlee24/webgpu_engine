@@ -1,3 +1,4 @@
+import { mat4 } from "wgpu-matrix";
 import shader from "../shaders/shader.wgsl?raw";
 import renderObject from "./renderObject";
 
@@ -10,10 +11,6 @@ export default class Triangle extends renderObject {
     this.indices = new Int32Array([0, 1, 2]);
     this.numVertices = 3;
     this.uniforms = new Float32Array();
-  }
-
-  initialize(device: GPUDevice) {
-    super.initialize(device);
   }
 
   init(device: GPUDevice, pass: GPURenderPassEncoder) {
@@ -36,17 +33,19 @@ export default class Triangle extends renderObject {
       primitive: {
         cullMode: "back",
       },
+      depthStencil: {
+        format: "depth24plus-stencil8",
+        depthWriteEnabled: true,
+        depthCompare: "less-equal",
+      },
     });
 
-    if (!this._initialized) {
-      this.initialize(device);
-    }
-
-    pass.setPipeline(this.pipeline);
-    pass.setBindGroup(0, this.bindGroup);
+    super.init(device, pass);
   }
 
   setUniforms(uniforms: Float32Array) {
-    super.setUniforms(uniforms);
+    const model = mat4.translation(this.position);
+    const unis = mat4.multiply(uniforms, model);
+    super.setUniforms(unis);
   }
 }

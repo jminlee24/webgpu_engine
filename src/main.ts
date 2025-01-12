@@ -14,11 +14,13 @@ const camera = new PerspectiveCamera(45, canvas.width / canvas.height);
 camera.position.set([1, 1, 5]);
 
 const triangle = new Triangle();
-//scene.add(triangle);
-const triangle1 = new Triangle(1, 1, 1);
-//scene.add(triangle1);
+scene.add(triangle);
+const triangle1 = new Triangle(3, 3, 3);
+scene.add(triangle1);
 const cube = new Cube(1, 1, 1);
+const cube1 = new Cube(2, 2, 1);
 scene.add(cube);
+scene.add(cube1);
 
 let lastloop = new Date();
 const fpsDisplay = document.getElementById("fps-display") as HTMLElement;
