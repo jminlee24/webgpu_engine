@@ -27,5 +27,5 @@ struct VSOutput{
 @fragment fn fs(
 vs : VSOutput
 ) -> @location(0) vec4f {
-  return vec4f(vs.texCoord, 0.0, 1.0)* textureSample(ourTexture, ourSampler, vs.texCoord);
+  return textureSample(ourTexture, ourSampler, vs.texCoord);
 }

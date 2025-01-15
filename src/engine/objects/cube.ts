@@ -1,6 +1,6 @@
 import { mat4 } from "wgpu-matrix";
 import renderObject from "./renderObject.ts";
-import shader from "../shaders/shader.wgsl?raw";
+import shader from "../shaders/cube.wgsl?raw";
 
 export class Cube extends renderObject {
   constructor(x: number = 0, y: number = 0, z: number = 0) {

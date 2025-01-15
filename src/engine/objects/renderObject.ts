@@ -1,5 +1,3 @@
-import { mat4 } from "wgpu-matrix";
-
 export default abstract class renderObject {
   _initialized: boolean = false;
 
@@ -39,14 +37,49 @@ export default abstract class renderObject {
       usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
     });
 
-    this.bindGroup = device.createBindGroup({
-      layout: this.pipeline.getBindGroupLayout(0),
-      entries: [{ binding: 0, resource: { buffer: this.uniformBuffer } }],
-    });
-
     device.queue.writeBuffer(this.vertexBuffer, 0, this.vertices);
     device.queue.writeBuffer(this.indexBuffer, 0, this.indices);
     device.queue.writeBuffer(this.uniformBuffer, 0, this.uniforms);
+
+    const texture = device.createTexture({
+      size: [6, 6],
+      format: "rgba8unorm",
+      usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST,
+    });
+
+    const _ = [255, 0, 0, 255]; // red
+    const y = [255, 255, 0, 255]; // yellow
+    const b = [0, 0, 255, 255]; // blue
+
+    //prettier-ignore
+    const textureData = new Uint8Array(
+      [
+        b, _, _, _, _, _,
+        _, y, y, y, _, _,
+        _, y, _, _, _, _,
+        _, y, y, _, _, _,
+        _, y, _, _, _, _,
+        _, _, _, _, _, _,
+      ].flat()
+    );
+
+    device.queue.writeTexture(
+      { texture },
+      textureData,
+      { bytesPerRow: 6 * 4 },
+      { width: 6, height: 6 },
+    );
+
+    const sampler = device.createSampler();
+
+    this.bindGroup = device.createBindGroup({
+      layout: this.pipeline.getBindGroupLayout(0),
+      entries: [
+        { binding: 0, resource: { buffer: this.uniformBuffer } },
+        { binding: 1, resource: sampler },
+        { binding: 2, resource: texture.createView() },
+      ],
+    });
   }
 
   // runs once per type (at the beginning of the render loop)
