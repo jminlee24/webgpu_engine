@@ -1,4 +1,4 @@
-import imageUrl from "../../textures/grass_block_side.png";
+import imageUrl from "/grass_block_side.png";
 
 export default abstract class renderObject {
   _initialized: boolean = false;

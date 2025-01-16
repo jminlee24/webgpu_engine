@@ -2,7 +2,6 @@ import "./styles.css";
 import { PerspectiveCamera } from "./engine/Camera";
 import { Renderer } from "./engine/Renderer";
 import { Scene } from "./engine/Scene";
-import Triangle from "./engine/objects/triangle";
 import { Cube } from "./engine/objects/cube";
 
 const canvas = document.getElementById("canvas") as HTMLCanvasElement;
@@ -13,10 +12,6 @@ const camera = new PerspectiveCamera(45, canvas.width / canvas.height);
 
 camera.position.set([1, 1, 5]);
 
-const triangle = new Triangle();
-scene.add(triangle);
-const triangle1 = new Triangle(3, 3, 3);
-scene.add(triangle1);
 const cube = new Cube(1, 1, 1);
 scene.add(cube);
 
@@ -41,4 +36,6 @@ const render = () => {
   requestAnimationFrame(render);
 };
 
-render();
+window.onload = () => {
+  render();
+};

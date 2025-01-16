@@ -3,9 +3,6 @@ import renderObject from "./renderObject.ts";
 import shader from "../shaders/cube.wgsl?raw";
 
 export class Cube extends renderObject {
-  normals: Float32Array;
-  normalBuffer!: GPUBuffer;
-
   constructor(x: number = 0, y: number = 0, z: number = 0) {
     super(x, y, z);
     //prettier-ignore
@@ -69,21 +66,6 @@ export class Cube extends renderObject {
     13, 1, 16, 16, 1, 4, // bottom face
     ]);
 
-    //prettier-ignore
-    this.normals = new Float32Array([
-       0, 0,-1, // back face
-       0, 0,-1, // back face
-       0, 0, 1,
-       0, 0, 1,
-       1, 0, 0, // right
-       1, 0, 0, // right
-      -1, 0, 0,
-      -1, 0, 0,
-       0, 1, 0,
-       0, 1, 0,
-       0,-1, 0,
-       0,-1, 0
-    ])
     this.numVertices = 36;
 
     // prettier-ignore
@@ -91,13 +73,6 @@ export class Cube extends renderObject {
   }
 
   initialize(device: GPUDevice): void {
-    this.normalBuffer = device.createBuffer({
-      size: this.normals.byteLength,
-      usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST,
-    });
-
-    device.queue.writeBuffer(this.normalBuffer, 0, this.normals);
-
     super.initialize(device);
   }
 
@@ -137,11 +112,6 @@ export class Cube extends renderObject {
 
     pass.setPipeline(this.pipeline);
     pass.setBindGroup(0, this.bindGroup);
-  }
-
-  draw(pass: GPURenderPassEncoder) {
-    pass.setVertexBuffer(1, this.normalBuffer);
-    super.draw(pass);
   }
 
   setUniforms(uniforms: Float32Array) {
