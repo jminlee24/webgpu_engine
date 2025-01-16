@@ -1,3 +1,5 @@
+import imageUrl from "../../textures/grass_block_side.png";
+
 export default abstract class renderObject {
   _initialized: boolean = false;
 
@@ -41,36 +43,31 @@ export default abstract class renderObject {
     device.queue.writeBuffer(this.indexBuffer, 0, this.indices);
     device.queue.writeBuffer(this.uniformBuffer, 0, this.uniforms);
 
+    const source = document.createElement("img") as HTMLImageElement;
+    source.src = imageUrl;
+
     const texture = device.createTexture({
-      size: [6, 6],
+      size: [source.width, source.height],
       format: "rgba8unorm",
-      usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST,
+      usage:
+        GPUTextureUsage.TEXTURE_BINDING |
+        GPUTextureUsage.COPY_DST |
+        GPUTextureUsage.RENDER_ATTACHMENT,
     });
 
-    const _ = [255, 0, 0, 255]; // red
-    const y = [255, 255, 0, 255]; // yellow
-    const b = [0, 0, 255, 255]; // blue
-
-    //prettier-ignore
-    const textureData = new Uint8Array(
-      [
-        b, _, _, _, _, _,
-        _, y, y, y, _, _,
-        _, y, _, _, _, _,
-        _, y, y, _, _, _,
-        _, y, _, _, _, _,
-        _, _, _, _, _, _,
-      ].flat()
-    );
-
-    device.queue.writeTexture(
+    device.queue.copyExternalImageToTexture(
+      { source },
       { texture },
-      textureData,
-      { bytesPerRow: 6 * 4 },
-      { width: 6, height: 6 },
+      { width: source.width, height: source.height },
     );
 
-    const sampler = device.createSampler();
+    const sampler = device.createSampler({
+      addressModeU: "repeat",
+      addressModeV: "repeat",
+      addressModeW: "repeat",
+      magFilter: "nearest",
+      minFilter: "linear",
+    });
 
     this.bindGroup = device.createBindGroup({
       layout: this.pipeline.getBindGroupLayout(0),

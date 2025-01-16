@@ -18,9 +18,7 @@ scene.add(triangle);
 const triangle1 = new Triangle(3, 3, 3);
 scene.add(triangle1);
 const cube = new Cube(1, 1, 1);
-const cube1 = new Cube(2, 2, 1);
 scene.add(cube);
-scene.add(cube1);
 
 let lastloop = new Date();
 const fpsDisplay = document.getElementById("fps-display") as HTMLElement;
