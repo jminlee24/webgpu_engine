@@ -47,7 +47,7 @@ export default abstract class renderObject {
     source.src = imageUrl;
 
     const texture = device.createTexture({
-      size: [source.width, source.height],
+      size: [source.width, source.height, 1],
       format: "rgba8unorm",
       usage:
         GPUTextureUsage.TEXTURE_BINDING |
@@ -56,7 +56,7 @@ export default abstract class renderObject {
     });
 
     device.queue.copyExternalImageToTexture(
-      { source },
+      { source, flipY: true },
       { texture },
       { width: source.width, height: source.height },
     );

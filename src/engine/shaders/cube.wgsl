@@ -14,14 +14,15 @@ struct VSOutput{
 
 @vertex fn vs(
   @location(0) position : vec3f,
-  @location(1) normal: vec3f
+  @location(1) normal: vec3f,
+  @location(2) uv: vec2f
 ) -> VSOutput {
 
   var vsout : VSOutput;
 
   vsout.position = uniforms.viewProjection * vec4f(position.xyz, 1.0);
 
-  vsout.texCoord = vec2f(position.x /2 , (1.0 - position.y) / 2);
+  vsout.texCoord = uv;
   vsout.normal = normal; 
 
   return vsout;
@@ -33,5 +34,5 @@ vs : VSOutput
 
   var normal = normalize(abs(vs.normal));
 
-  return vec4f(normal, 1.0) * textureSample(ourTexture, ourSampler, vs.texCoord);
+  return textureSample(ourTexture, ourSampler, vs.texCoord);
 }

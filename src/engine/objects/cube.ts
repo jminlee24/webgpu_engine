@@ -9,52 +9,83 @@ export class Cube extends renderObject {
     this.vertices = new Float32Array([
     -1, -1, -1, //0 left bottom back 
     -1,  0,  0, // left
+     0,  0,
     -1, -1, -1, //1 left bottom back 
      0,  -1, 0, // bottom
+     0,  0,
     -1, -1, -1, //2 left bottom back 
      0,  0, -1, // back
+     1,  0,
+
      1, -1, -1, //3 right bottom back 
      1,  0,  0, // right 
+     1,  0,
      1, -1, -1, //4 right bottom back 
      0,  -1, 0, // bottom
+     1,  0,
      1, -1, -1, //5 right bottom back 
      0,  0, -1, // back
+     0,  0,
+
      1,  1, -1, //6 right top back 
      1,  0,  0, // right 
+     0,  1,
      1,  1, -1, //7 right top back 
      0,  1,  0, // top 
+     1,  1, 
      1,  1, -1, //8 right top back 
      0,  0, -1, // back
+     0,  1, 
+
     -1,  1, -1, //9 left top back 
     -1,  0,  0, // left
+     0,  1, 
     -1,  1, -1, //10 left top back 
      0,  1,  0, // top 
+     0,  1,
     -1,  1, -1, //11 left top back 
      0,  0, -1, // back
+     1,  1, 
+
     -1, -1,  1, //12 left bottom front 
     -1,  0,  0, // left
+     1,  0,
     -1, -1,  1, //13 left bottom front 
-     0,  -1, 0, // bottom
+     0, -1, 0, // bottom
+     0,  1,
     -1, -1,  1, //14 left bottom front 
      0,  0,  1, // front 
+     0,  0,
+
      1, -1,  1, //15 right bottom front 
      1,  0,  0, // right 
+     0,  0,
      1, -1,  1, //16 right bottom front 
-     0,  -1, 0, // bottom
+     0, -1,  0, // bottom
+     1,  1, 
      1, -1,  1, //17 right bottom front 
      0,  0,  1, // front 
+     1,  0,
+
      1,  1,  1, //18 right top front 
      1,  0,  0, // right 
+     0,  1,
      1,  1,  1, //19 right top front 
      0,  1,  0, // top 
+     1,  0,
      1,  1,  1, //20 right top front 
      0,  0,  1, // front 
+     1,  1, 
+
     -1,  1,  1, //21 left top front
     -1,  0,  0, // left
+     1,  1, 
     -1,  1,  1, //22 left top front
      0,  1,  0, // top 
+     0,  0,
     -1,  1,  1, //23 left top front
      0,  0,  1, // front 
+     0,  1,
     ]);
     // prettier-ignore
     this.indices = new Int32Array([     
@@ -84,10 +115,11 @@ export class Cube extends renderObject {
         module,
         buffers: [
           {
-            arrayStride: 6 * 4,
+            arrayStride: 8 * 4,
             attributes: [
               { shaderLocation: 0, offset: 0, format: "float32x3" }, //pos
               { shaderLocation: 1, offset: 12, format: "float32x3" }, //norm
+              { shaderLocation: 2, offset: 24, format: "float32x2" }, //uv
             ],
           },
         ],
