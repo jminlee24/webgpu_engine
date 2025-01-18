@@ -29,7 +29,7 @@ export class Cube extends renderObject {
 
      1,  1, -1, //6 right top back 
      1,  0,  0, // right 
-     0,  1,
+     1,  1,
      1,  1, -1, //7 right top back 
      0,  1,  0, // top 
      1,  1, 
