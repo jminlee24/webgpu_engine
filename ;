@@ -1,0 +1,21 @@
+import { Renderer } from "../Renderer";
+
+class Backend {
+  renderer: Renderer;
+
+  device: GPUDevice | null;
+  context: GPUCanvasContext | null;
+  defaultRenderPassDescriptor: GPURenderPassDescriptor | null;
+
+  constructor() {
+    this.device = null;
+    this.context = null;
+    this.defaultRenderPassDescriptor = null;
+  }
+
+  async init() {
+    this.renderer = renderer;
+  }
+}
+
+export default Backend;

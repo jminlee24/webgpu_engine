@@ -1,71 +1,24 @@
 import { Camera } from "./Camera";
-import { UnsupportedError } from "./gpu/types";
+import Backend from "./gpu/backend";
 import { Scene } from "./Scene";
 
 export class Renderer {
   private _initialized: boolean = false;
 
-  private device!: GPUDevice;
-  private canvas: HTMLCanvasElement;
-  private context: GPUCanvasContext;
-
-  private renderPassDescriptor!: GPURenderPassDescriptor;
+  backend: Backend;
+  canvas: HTMLCanvasElement;
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
-    const ctx = this.canvas.getContext("webgpu");
-    if (!ctx) {
-      throw new UnsupportedError();
-    }
-    this.context = ctx;
+    this.backend = new Backend();
   }
 
   async init() {
-    const adapter = await navigator.gpu?.requestAdapter();
-    const device = await adapter?.requestDevice();
-
-    if (!device) {
-      throw new UnsupportedError();
+    if (this._initialized) {
+      throw new Error("Renderer: Backend already initialized");
     }
 
-    this.device = device;
-    const presentationFormat = navigator.gpu.getPreferredCanvasFormat();
-
-    this.context.configure({
-      device: this.device,
-      format: presentationFormat,
-    });
-
-    const depthTexture = this.device.createTexture({
-      size: { width: this.canvas.width, height: this.canvas.height },
-      dimension: "2d",
-      format: "depth24plus-stencil8",
-      usage: GPUTextureUsage.RENDER_ATTACHMENT,
-    });
-
-    this.renderPassDescriptor = {
-      colorAttachments: [
-        {
-          view: this.context.getCurrentTexture().createView(),
-          clearValue: [0.3, 0.3, 0.3, 1],
-          loadOp: "clear",
-          storeOp: "store",
-        },
-      ],
-      depthStencilAttachment: {
-        view: depthTexture.createView({
-          format: "depth24plus-stencil8",
-          dimension: "2d",
-          aspect: "all",
-        }),
-        depthClearValue: 1,
-        depthLoadOp: "clear",
-        depthStoreOp: "store",
-        stencilLoadOp: "clear",
-        stencilStoreOp: "store",
-        stencilClearValue: 1,
-      },
-    };
+    await this.backend.init(this);
 
     const resizeObserver = new ResizeObserver(() => {
       this.resize();
@@ -80,45 +33,20 @@ export class Renderer {
       await this.init();
       this._initialized = true;
     }
-    this.render(scene, camera);
+    this.renderScene(scene, camera);
   }
 
   render(scene: Scene, camera: Camera, deltaTime: number = -1) {
     if (this._initialized === false) {
       return this.renderAsync(scene, camera);
     }
-
-    (
-      this.renderPassDescriptor
-        .colorAttachments as GPURenderPassColorAttachment[]
-    )[0].view = this.context.getCurrentTexture().createView();
-
-    const encoder = this.device.createCommandEncoder();
-    const pass = encoder.beginRenderPass(this.renderPassDescriptor);
-
-    // update camera matrices, up, right, forward vectors
     camera.update(this.canvas, deltaTime);
 
-    // TODO: load geomotry and textures for object
-    // TODO: foreach instance of object :
-    //         load model matrix
-    //         load instance specific materials or default materials
-    //         render object
-    //
-    for (const [i, obj] of scene.objects.entries()) {
-      // TODO: Fix this part
-      // init should onyl run once at the very start of the render
-      if (i >= 0) {
-        obj.setUniforms(camera.camMatrix);
-        obj.init(this.device, pass);
-      }
-      obj.draw(pass);
-    }
+    this.renderScene(scene, camera);
+  }
 
-    pass.end();
-
-    const commandBuffer = encoder.finish();
-    this.device.queue.submit([commandBuffer]);
+  renderScene(scene: Scene, camera: Camera) {
+    this.backend.beginRender(scene, camera);
   }
 
   resize() {

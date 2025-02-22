@@ -3,8 +3,12 @@ import renderObject from "./renderObject.ts";
 import shader from "../shaders/cube.wgsl?raw";
 
 export class Cube extends renderObject {
-  constructor(x: number = 0, y: number = 0, z: number = 0) {
+  scale: number[];
+
+  constructor(x: number = 0, y: number = 0, z: number = 0, scale = [1, 1, 1]) {
     super(x, y, z);
+    this.scale = scale;
+
     //prettier-ignore
     this.vertices = new Float32Array([
     -1, -1, -1, //0 left bottom back 
@@ -147,7 +151,7 @@ export class Cube extends renderObject {
   }
 
   setUniforms(uniforms: Float32Array) {
-    const model = mat4.translation(this.position);
+    const model = mat4.scale(mat4.translation(this.position), this.scale);
 
     this.uniforms = mat4.multiply(uniforms, model);
   }

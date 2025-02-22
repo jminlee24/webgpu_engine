@@ -12,8 +12,13 @@ const camera = new PerspectiveCamera(45, canvas.width / canvas.height);
 
 camera.position.set([1, 1, 5]);
 
-const cube = new Cube(1, 1, 1);
-scene.add(cube);
+for (let i = 0; i < 10; i += 2) {
+  for (let j = 0; j < 10; j += 2) {
+    for (let k = 0; k < 10; k += 2) {
+      scene.add(new Cube(i, j, k));
+    }
+  }
+}
 
 let lastloop = new Date();
 const fpsDisplay = document.getElementById("fps-display") as HTMLElement;
